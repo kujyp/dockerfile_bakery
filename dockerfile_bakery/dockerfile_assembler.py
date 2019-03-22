@@ -333,10 +333,10 @@ def generate_build_script(imagename, dependency):
             if dependency is None:
                 pulloption = " --pull"
             cmds[tag] = "docker build{} -t {}:{} -f {}/{} .".format(pulloption,
-                                                                          imagename,
-                                                                          tag,
-                                                                          relpath,
-                                                                          filename)
+                                                                    imagename,
+                                                                    tag,
+                                                                    relpath,
+                                                                    filename)
         break
 
     for tag in sorted(cmds):
