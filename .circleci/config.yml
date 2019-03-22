@@ -78,6 +78,7 @@ jobs:
       - run:
           name: install dependency
           command: |
+            cd workspace
             python3 -m venv venv
             source venv/bin/activate
             pip install -U pip setuptools twine
@@ -85,6 +86,7 @@ jobs:
       - run:
           name: deploy
           command: |
+            cd workspace
             source venv/bin/activate
             export TWINE_USERNAME="${PYPI_USERNAME}"
             export TWINE_PASSWORD="${PYPI_PASSWORD}"
@@ -102,6 +104,7 @@ jobs:
       - run:
           name: install dependency
           command: |
+            cd workspace
             python3 -m venv venv
             source venv/bin/activate
             pip install -U pip setuptools twine
@@ -109,6 +112,7 @@ jobs:
       - run:
           name: deploy sdist
           command: |
+            cd workspace
             source venv/bin/activate
             export TWINE_USERNAME="${PYPI_USERNAME}"
             export TWINE_PASSWORD="${PYPI_PASSWORD}"
@@ -117,6 +121,7 @@ jobs:
       - run:
           name: deploy wheel
           command: |
+            cd workspace
             source venv/bin/activate
             pip install wheel
             export TWINE_USERNAME="${PYPI_USERNAME}"
