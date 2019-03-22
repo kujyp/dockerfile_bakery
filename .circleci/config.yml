@@ -1,0 +1,158 @@
+version: 2.0
+
+jobs:
+  lint:
+    docker:
+      - image: circleci/python:3.6
+    working_directory: ~/app
+
+    steps:
+    - checkout
+    - persist_to_workspace:
+        root: .
+        paths:
+          - .
+    - run:
+        name: lint checks
+        command: |
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install flake8==3.6.0
+          tools/lint.sh
+
+  test_on_py3.6: &test-template
+    docker:
+      - image: circleci/python:3.6
+
+    steps:
+    - attach_workspace:
+        at: workspace
+    - restore_cache:
+        keys:
+        - v1-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "requirements.txt" }}
+
+    - run:
+        name: install dependencies
+        command: |
+          python -m venv venv || virtualenv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+
+    - save_cache:
+        paths:
+        - ./venv
+        key: v1-dependencies-{{ checksum "requirements.txt" }}
+
+    - run:
+        name: sdist install test
+        command: |
+          tools/sdistinstalltest.sh
+
+    - run:
+        name: whell install test
+        command: |
+          tools/wheelinstalltest.sh
+
+  test_on_py2.7:
+    <<: *test-template
+    docker:
+      - image: circleci/python:2.7
+
+  test_on_py3.5:
+    <<: *test-template
+    docker:
+      - image: circleci/python:3.5
+
+  test_on_py3.7:
+    <<: *test-template
+    docker:
+      - image: circleci/python:3.7
+
+  deploy_test_pypi:
+    docker:
+      - image: circleci/python:3.6
+
+    steps:
+      - attach_workspace:
+          at: workspace
+
+      - run:
+          name: install dependency
+          command: |
+            python3 -m venv venv
+            source venv/bin/activate
+            pip install -U pip setuptools twine
+
+      - run:
+          name: deploy
+          command: |
+            source venv/bin/activate
+            export TWINE_USERNAME="${PYPI_USERNAME}"
+            export TWINE_PASSWORD="${PYPI_PASSWORD}"
+            python3 setup.py sdist
+            twine upload --repository-url https://test.pypi.org/legacy/ dist/*.tar.gz
+
+  deploy_pypi:
+    docker:
+      - image: circleci/python:3.6
+
+    steps:
+      - attach_workspace:
+          at: workspace
+
+      - run:
+          name: install dependency
+          command: |
+            python3 -m venv venv
+            source venv/bin/activate
+            pip install -U pip setuptools twine
+
+      - run:
+          name: deploy sdist
+          command: |
+            source venv/bin/activate
+            export TWINE_USERNAME="${PYPI_USERNAME}"
+            export TWINE_PASSWORD="${PYPI_PASSWORD}"
+            tools/deploy_sdist.sh
+
+      - run:
+          name: deploy wheel
+          command: |
+            source venv/bin/activate
+            pip install wheel
+            export TWINE_USERNAME="${PYPI_USERNAME}"
+            export TWINE_PASSWORD="${PYPI_PASSWORD}"
+            tools/deploy_wheel.sh
+
+
+workflows:
+  version: 2
+  test_build_deploy:
+    jobs:
+      - lint
+      - test_on_py2.7
+      - test_on_py3.5
+      - test_on_py3.6
+      - test_on_py3.7
+      - build:
+          requires:
+            - lint
+            - test_on_py2.7
+            - test_on_py3.5
+            - test_on_py3.6
+            - test_on_py3.7
+
+      - deploy_test_pypi:
+          filters:
+            branches:
+              only:
+                  - master
+          requires:
+            - build
+
+      - deploy_pypi:
+          requires:
+            - deploy_test_pypi
+          filters:
+            tags:
+              only: /.*/
