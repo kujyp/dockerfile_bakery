@@ -14,9 +14,10 @@ get_script_path() {
     echo $(cd -P "$(dirname "$_src")" && pwd)
 }
 
-cd_into_script_path() {
-    local script_path=$(get_script_path)
-    cd ${script_path}
+
+cd_into_gitrootdir() {
+    local topdir=$(git rev-parse --show-toplevel)
+    cd ${topdir}
 }
 
 command_exists() {
@@ -34,12 +35,10 @@ pip install flake8==3.6.0${nocolor}"
 fi
 
 (
-cd_into_script_path
-cd ..
+cd_into_gitrootdir
 
 echo -e "${yellow}[INFO] flake8 version: [$(flake8 --version)]${nocolor}"
-# E402 - module level import not at top of file
 # E501 - line too long
-flake8 --exclude 'venv*,build' --ignore E501,E702
+flake8 --exclude 'venv*,build' --ignore E501
 echo -e "${yellow}[INFO] [${BASH_SOURCE[0]}] Done.${nocolor}"
 )
