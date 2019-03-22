@@ -38,7 +38,7 @@ def _get_prefix():
     assert filename != os.path.basename(__file__)
     # funcname = trcb[-3][2]
     prefix = "{}/{}".format(currtime, filename)
-    return "{0:{1}}".format(prefix, 20)
+    return "{0:{1}}".format(prefix, 35)
 
 
 def _print_with_color(color, msg):

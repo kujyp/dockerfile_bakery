@@ -3,6 +3,7 @@ import errno
 import shutil
 import stat
 
+from dockerfile_bakery.utils import console
 from jinja2 import FileSystemLoader, Environment, meta
 
 
@@ -80,6 +81,7 @@ def mkdir_p(path):
 
 def rm_rf(path):
     assert path != "/"
+    console.info("Delete files. [$ rm -rf {}] ...".format(path))
     if os.path.exists(path):
         shutil.rmtree(path)
 
@@ -388,12 +390,17 @@ def generate_push_scripts():
 
 
 def invoke_generate(context_path,
-                    partial_path="../partial_dockerfiles",
-                    generated_path="../generated"):
+                    partial_path="partial_dockerfiles",
+                    generated_path="generated"):
     partial_normpath = os.path.normpath(
         os.path.join(context_path, partial_path))
     generated_normpath = os.path.normpath(
         os.path.join(context_path, generated_path))
+
+    console.info("partial_path=[{}], generated_path=[{}]".format(
+        os.path.relpath(partial_path, "."),
+        os.path.relpath(generated_path, "."),
+    ))
     Environments.init(partial_normpath, generated_normpath)
     rm_rf(Environments.generated_path)
 

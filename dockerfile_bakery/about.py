@@ -1,2 +1,2 @@
-__version__ = "0.0.0-dev1"
+__version__ = "0.1.0"
 __description__ = "Generate Dockerfiles from Partial Dockerfiles"
