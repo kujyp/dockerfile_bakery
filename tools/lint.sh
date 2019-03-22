@@ -40,6 +40,6 @@ cd ..
 echo -e "${yellow}[INFO] flake8 version: [$(flake8 --version)]${nocolor}"
 # E402 - module level import not at top of file
 # E501 - line too long
-flake8 --exclude 'venv*' --ignore E501,E702
+flake8 --exclude 'venv*,build' --ignore E501,E702
 echo -e "${yellow}[INFO] [${BASH_SOURCE[0]}] Done.${nocolor}"
 )
