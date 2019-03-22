@@ -133,21 +133,17 @@ workflows:
       - test_on_py3.5
       - test_on_py3.6
       - test_on_py3.7
-      - build:
-          requires:
-            - lint
-            - test_on_py2.7
-            - test_on_py3.5
-            - test_on_py3.6
-            - test_on_py3.7
-
       - deploy_test_pypi:
           filters:
             branches:
               only:
                   - master
           requires:
-            - build
+            - lint
+            - test_on_py2.7
+            - test_on_py3.5
+            - test_on_py3.6
+            - test_on_py3.7
 
       - deploy_pypi:
           requires:
