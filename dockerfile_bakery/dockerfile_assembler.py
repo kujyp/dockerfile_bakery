@@ -53,8 +53,7 @@ echo -e "${yellow}[INFO] [${BASH_SOURCE[0]}] executed.${nocolor}"
 if ! command_exists docker; then
     echo -e "${red}[ERROR] Install docker first.\\n\\
 [MacOS] $ brew cask install docker\\n\\
-[Centos7] $ yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && yum install docker-ce\\n\\
-[Centos6] $ yum install docker-io${nocolor}"
+[Linux] $ curl -fsSL https://get.docker.com | sh${nocolor}"
     exit 1;
 fi
 
