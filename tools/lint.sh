@@ -28,6 +28,7 @@ fi
 cd_into_gitrootdir
 
 echo -e "${yellow}[INFO] flake8 version: [$(flake8 --version)]${nocolor}"
+echo -e "${yellow}[INFO] Context: [$(pwd)]${nocolor}"
 # E501 - line too long
 flake8 --exclude 'venv*,build' --ignore E501
 )
