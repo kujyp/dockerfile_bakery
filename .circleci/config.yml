@@ -43,6 +43,13 @@ jobs:
         key: v1-dependencies-{{ .Environment.CIRCLE_JOB }}-{{ checksum "requirements.txt" }}
 
     - run:
+        name: pytest
+        command: |
+          source venv/bin/activate
+          pip install pytest
+          tools/pytests.sh
+
+    - run:
         name: sdist install test
         command: |
           tools/sdistinstalltest.sh
