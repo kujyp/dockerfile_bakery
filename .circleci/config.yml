@@ -126,4 +126,4 @@ workflows:
             - test_on_py3.7
           filters:
             tags:
-              only: /.*/
+              only: /^v.*/
