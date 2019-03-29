@@ -181,7 +181,6 @@ def test_should_build_script_contains_right_statement(testassets_path,
         script_content = f.read()
         expected_build_statement = \
             "docker build" \
-            " --pull" \
             " -t registry.navercorp.com/mtengine/tf_bazel_builder:cuda10.0_cudnn7.4_python2.7.15_tf1.12.0_capability3.5_7.0_xla" \
             " -f ../dockerfiles/registry.navercorp.com/mtengine/tf_bazel_builder/Dockerfile.cuda10.0_cudnn7.4_python2.7.15_tf1.12.0_capability3.5_7.0_xla" \
             " ."
