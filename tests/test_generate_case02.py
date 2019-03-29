@@ -222,3 +222,18 @@ def test_should_pull_script_contains_right_statement(testassets_path,
         script_content = f.read()
         assert "docker push registry.navercorp.com/mtengine/tf_bazel_builder:cuda10.0_cudnn7.4_python2.7.15_tf1.12.0_capability3.5_7.0" in script_content
         assert "docker push registry.navercorp.com/mtengine/tf_bazel_builder:cuda10.0_cudnn7.4_python2.7.15_tf1.12.0_capability3.5_7.0_xla" in script_content
+
+
+def test_child_build_script_contains_execution_build_parent(testassets_path,
+                                                            partial_path,
+                                                            generated_path,
+                                                            expected_generated_scripts_dir):
+    rm_rf(os.path.join(testassets_path, generated_path))
+    invoke_generate(testassets_path, partial_path, generated_path)
+    with open(os.path.join(expected_generated_scripts_dir, "build_tf_bazel_builder_base.sh"), 'r') as f:
+        script_content = f.read()
+        assert "./build_" not in script_content
+
+    with open(os.path.join(expected_generated_scripts_dir, "build_tf_bazel_builder.sh"), 'r') as f:
+        script_content = f.read()
+        assert "./build_tf_bazel_builder_base.sh" in script_content
