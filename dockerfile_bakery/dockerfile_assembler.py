@@ -134,7 +134,6 @@ class GeneratedDockerfile:
 
 class DockerfileTemplate(object):
     def __init__(self, path):
-        super().__init__()
         self.filename = os.path.basename(path)
         self.dirname = os.path.dirname(path)
         self.generated_dockerfiles = []
