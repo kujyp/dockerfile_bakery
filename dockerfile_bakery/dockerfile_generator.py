@@ -3,11 +3,13 @@ import errno
 import shutil
 import stat
 
+import yaml
+
+from dockerfile_bakery import consts
 from dockerfile_bakery.utils import console
 from jinja2 import FileSystemLoader, Environment, meta
 
 
-SEED_DOCKERFILE = "seed.Dockerfile"
 GENERATED_MESSAGE = """\
 ###############################################################################
 ###############################################################################
@@ -294,114 +296,7 @@ class DockerfileSeed(DockerfileTemplate):
         return "DockerfileSeed: [{}]".format(self.__dict__)
 
 
-def get_seed_list(path):
-    ret = []
-    for dirpath, dirnames, filenames in os.walk(path):
-        for filename in filenames:
-            if filename == SEED_DOCKERFILE:
-                seedfile_path = os.path.join(
-                    os.path.relpath(dirpath, path), filename)
-                ret.append(DockerfileSeed(seedfile_path))
-    return ret
-
-
-def generate_dockerfiles():
-    seed_list = get_seed_list(Environments.partialdockerfile_path)
-    for eachseed in seed_list:
-        eachseed.generate_dockerfiles()
-
-
-def generate_build_script(imagename, dependency):
-    script_content = ""
-
-    script_content += SCRIPT_PREFIX
-    if dependency is not None:
-        script_content += "./build_{}.sh\n".format(dependency)
-
-    cmds = {}
-    for dirpath, dirnames, filenames in os.walk(Environments.get_generated_dockerfile_path(imagename)):
-        relpath = os.path.relpath(dirpath, Environments.generated_scripts_path)
-        for filename in filenames:
-            if filename.startswith("Dockerfile."):
-                tag = filename[len("Dockerfile."):]
-            else:
-                tag = "latest"
-
-            pulloption = ""
-            if dependency is None:
-                pulloption = " --pull"
-            cmds[tag] = "docker build{} -t {}:{} -f {}/{} .".format(pulloption,
-                                                                    imagename,
-                                                                    tag,
-                                                                    relpath,
-                                                                    filename)
-        break
-
-    for tag in sorted(cmds):
-        script_content = script_content + cmds[tag] + '\n'
-
-    script_content += SCRIPT_POSTFIX
-    scriptpath = os.path.join(Environments.generated_scripts_path,
-                              "build_{}.sh".format(os.path.basename(imagename)))
-    save(scriptpath, script_content)
-    chmod_plus_x(scriptpath)
-
-
-def generate_build_scripts():
-    seed_list = get_seed_list(Environments.partialdockerfile_path)
-    for eachseed in seed_list:
-        generate_build_script(eachseed.imagename, eachseed.dependency)
-
-
-def generate_push_script(imagename):
-    script_content = ""
-
-    script_content += SCRIPT_PREFIX
-    script_content += "./build_{}.sh\n".format(os.path.basename(imagename))
-
-    cmds = {}
-    for dirpath, dirnames, filenames in os.walk(
-            Environments.get_generated_dockerfile_path(imagename)):
-        for filename in filenames:
-            if filename.startswith("Dockerfile."):
-                tag = filename[len("Dockerfile."):]
-            else:
-                tag = "latest"
-
-            cmds[tag] = "docker push {}:{}".format(imagename, tag)
-        break
-
-    for tag in sorted(cmds):
-        script_content = script_content + cmds[tag] + '\n'
-
-    script_content += SCRIPT_POSTFIX
-    scriptpath = os.path.join(Environments.generated_scripts_path,
-                              "push_{}.sh".format(os.path.basename(imagename)))
-    save(scriptpath, script_content)
-    chmod_plus_x(scriptpath)
-
-
-def generate_push_scripts():
-    seed_list = get_seed_list(Environments.partialdockerfile_path)
-    for eachseed in seed_list:
-        generate_push_script(eachseed.imagename)
-
-
-def invoke_generate(context_path,
-                    partial_path="partial_dockerfiles",
-                    generated_path="generated"):
-    partial_normpath = os.path.normpath(
-        os.path.join(context_path, partial_path))
-    generated_normpath = os.path.normpath(
-        os.path.join(context_path, generated_path))
-
-    console.info("partial_path=[{}], generated_path=[{}]".format(
-        os.path.relpath(partial_path, "."),
-        os.path.relpath(generated_path, "."),
-    ))
-    Environments.init(partial_normpath, generated_normpath)
-    rm_rf(Environments.generated_path)
-
-    generate_dockerfiles()
-    generate_build_scripts()
-    generate_push_scripts()
+def generate_dockerfile(seed_yaml_path):
+    assert os.path.exists(seed_yaml_path)
+    with open(seed_yaml_path, 'r') as f:
+        print(yaml.load(f))

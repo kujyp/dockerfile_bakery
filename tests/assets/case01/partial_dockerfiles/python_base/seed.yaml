@@ -1,0 +1,6 @@
+dockerfile_template: seed.Dockerfile
+from: centos:7
+entities:
+ - python
+imagename: python_base
+tagname: "{{ python }}"

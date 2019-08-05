@@ -2,7 +2,7 @@ from functools import update_wrapper
 
 import click
 
-from dockerfile_bakery.dockerfile_assembler import invoke_generate
+from dockerfile_bakery.generate import invoke_generate
 from dockerfile_bakery.utils import console
 
 
@@ -40,22 +40,21 @@ def enable_debug_mode(f):
                 type=str)
 @click.option('--partial-path', '-P',
               required=False,
-              type=str,
-              help="User account(oss.navercorp.com)")
+              default="partial_dockerfiles",
+              type=str)
 @click.option('--generated-path', '-G',
               required=False,
-              help="User account(oss.navercorp.com)")
+              default="generated",
+              type=str)
 @enable_debug_mode
 def generate(context_path, partial_path, generated_path):
     """Generate dockerfiles from partial dockerfiles"""
     console.notice("Command generate")
     kargs = {
-        "context_path": context_path
+        "context_path": context_path,
+        "partial_path": partial_path,
+        "generated_path": generated_path,
     }
-    if partial_path is not None:
-        kargs["partial_path"] = partial_path
-    if generated_path is not None:
-        kargs["generated_path"] = generated_path
     invoke_generate(**kargs)
 
 

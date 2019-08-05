@@ -1,4 +1,4 @@
-FROM {{ __FROM__tf_bazel_builder_base }}
+{{ FROM }}
 
 ENV TF_NEED_CUDA=1
 ENV CUDA_PATH=/usr/local/cuda

@@ -1,4 +1,4 @@
-FROM centos:7
+{{ FROM }}
 
 RUN yum install -y \
  wget gcc make \

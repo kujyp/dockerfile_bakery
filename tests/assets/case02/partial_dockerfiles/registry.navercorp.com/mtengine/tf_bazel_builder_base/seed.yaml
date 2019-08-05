@@ -1,0 +1,7 @@
+dockerfile_template: seed.Dockerfile
+from: "{{ tf_bazel_builder_base }}"
+entities:
+ - from_cuda_python_base_with_nccl_installation
+ - tensorflow
+imagename: tf_bazel_builder_base
+tagname: "{{ from_cuda_python_base_with_nccl_installation }}_{{ tensorflow }}"

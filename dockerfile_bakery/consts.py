@@ -1,0 +1,2 @@
+SEED_YAML_FILENAME = "seed.yaml"
+DEFAULT_DOCKERFILE_TEMPLATE = "seed.Dockerfile"
